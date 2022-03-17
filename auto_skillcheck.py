@@ -5,11 +5,20 @@ import cv2
 from pynput.keyboard import Controller, KeyCode
 from time import sleep
 
+# Удаление активной кнопки проверки (закраска чёрным для исключения ложных срабатываний
+def colorButtonBlack(img, topBorder, bottomBorder, leftBorder, rightBorder):
+    img[topBorder:bottomBorder, leftBorder:rightBorder] = 0
 
 def auto_skillcheck(toggle: bool, is_target_active: bool, 
                     window_rect: list, sct_monitor: Union[dict, str], keycode: object=KeyCode(0x43)):
     """auto_skillcheck function
     """
+    
+    # Границы кнопки в центре проверочного экрана
+    topBorder = 55
+    bottomBorder = 85
+    leftBorder = 19
+    rightBorder = 114
     
     low_white = np.array([250, 250, 250])
     high_white = np.array([255, 255, 255])
@@ -36,6 +45,9 @@ def auto_skillcheck(toggle: bool, is_target_active: bool,
                     last_rect = monitor.copy()
 
                 img = cv2.cvtColor(utility.get_sct(monitor), cv2.COLOR_BGR2RGB)
+                
+                # Удаление кнопки "пробел"
+                colorButtonBlack(img, topBorder, bottomBorder, leftBorder, rightBorder)
 
                 white_range = cv2.inRange(img, low_white, high_white)
                 red_range = cv2.inRange(img, low_red, high_red)
